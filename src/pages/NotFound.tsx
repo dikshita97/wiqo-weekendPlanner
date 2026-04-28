@@ -1,24 +1,19 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Logo } from "@/components/wiqo/Logo";
 
-const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
-
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </a>
+const NotFound = () => (
+  <div className="min-h-screen bg-warm grain flex flex-col">
+    <header className="container mx-auto py-6"><Logo /></header>
+    <main className="flex-1 flex items-center justify-center text-center px-6">
+      <div>
+        <p className="font-display text-9xl text-gradient-sunset">404</p>
+        <h1 className="font-display text-4xl mt-2">This page took the weekend off.</h1>
+        <Link to="/" className="mt-8 inline-flex rounded-full bg-foreground text-background px-6 py-3 hover:opacity-90">
+          Take me home
+        </Link>
       </div>
-    </div>
-  );
-};
+    </main>
+  </div>
+);
 
 export default NotFound;
