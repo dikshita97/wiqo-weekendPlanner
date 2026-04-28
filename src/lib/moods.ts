@@ -6,6 +6,8 @@ export type ActionLink = {
   kind: "search" | "book" | "watch" | "listen" | "read" | "map" | "ai";
 };
 
+import type { NearbyKind } from "@/components/wiqo/NearbyPlaces";
+
 export type SubActivity = {
   id: string;
   title: string;
@@ -15,6 +17,10 @@ export type SubActivity = {
   // For non-AI activities, helpers that build links given user context.
   buildLinks?: (ctx: { city?: string; lat?: number; lng?: number; dateRange?: string }) => ActionLink[];
   curated?: { title: string; subtitle?: string; href: string; tag?: string }[];
+  // Extras: real-time enriched sections rendered on the result page
+  trendingMovies?: boolean;
+  nearby?: { kinds: NearbyKind[]; title: string };
+  instantOrder?: boolean; // Blinkit / Zepto / Instamart quick-buy strip
 };
 
 export type Mood = {
