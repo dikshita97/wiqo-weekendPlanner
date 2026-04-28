@@ -74,6 +74,7 @@ export const MOODS: Mood[] = [
         description: "Tea, blanket, paper. That's the whole plan.",
         emoji: "📖",
         type: "links",
+        nearby: { kinds: ["library", "stationery"], title: "Libraries & stationery near you" },
         buildLinks: () => [
           { label: "Browse Goodreads", href: "https://www.goodreads.com/", kind: "read" },
           { label: "Cozy reading playlist", href: spotifySearch("cozy reading"), kind: "listen" },
@@ -92,8 +93,8 @@ export const MOODS: Mood[] = [
         description: "Soft hands, warm steam, slower breath.",
         emoji: "🛁",
         type: "mixed",
-        buildLinks: (ctx) => [
-          { label: "Spas near you", href: mapsNear("spa", ctx.lat, ctx.lng), kind: "map" },
+        nearby: { kinds: ["spa"], title: "Spas near you" },
+        buildLinks: () => [
           { label: "At-home spa routine (YouTube)", href: ytSearch("at home spa night routine aesthetic"), kind: "watch" },
           { label: "Calm playlist", href: spotifySearch("spa music"), kind: "listen" },
         ],
@@ -172,10 +173,10 @@ export const MOODS: Mood[] = [
         description: "Loud nights, soft mornings.",
         emoji: "🪩",
         type: "links",
-        buildLinks: (ctx) => [
-          { label: "Clubs near you", href: mapsNear("nightclub", ctx.lat, ctx.lng), kind: "map" },
+        nearby: { kinds: ["nightclub", "bar"], title: "Clubs & bars near you" },
+        buildLinks: () => [
           { label: "Tonight's party playlist", href: spotifySearch("party playlist 2025"), kind: "listen" },
-          { label: "Book Uber", href: "https://m.uber.com/", kind: "book" },
+          { label: "Pre-game cocktails", href: googleSearch("easy 3 ingredient cocktails recipes"), kind: "search" },
         ],
       },
       {
@@ -184,8 +185,8 @@ export const MOODS: Mood[] = [
         description: "Eggs, espresso, gossip.",
         emoji: "🍳",
         type: "links",
-        buildLinks: (ctx) => [
-          { label: "Brunch spots near you", href: mapsNear("brunch", ctx.lat, ctx.lng), kind: "map" },
+        nearby: { kinds: ["cafe", "restaurant"], title: "Brunch spots near you" },
+        buildLinks: () => [
           { label: "Best brunch in town", href: googleSearch("best brunch spots near me reviews"), kind: "search" },
         ],
       },
@@ -211,15 +212,16 @@ export const MOODS: Mood[] = [
         description: "Cards, board games, controlled chaos.",
         emoji: "🎲",
         type: "links",
+        instantOrder: true,
         buildLinks: () => [
           { label: "Best party games", href: googleSearch("best party games for adults game night"), kind: "search" },
-          { label: "Buy on Amazon", href: "https://www.amazon.com/s?k=board+games", kind: "book" },
           { label: "Print-and-play games", href: googleSearch("free printable party games"), kind: "search" },
         ],
         curated: [
           { title: "Codenames", subtitle: "Word association classic", href: "https://www.amazon.com/s?k=codenames+game", tag: "4–8 players" },
           { title: "Wavelength", subtitle: "Telepathy in a box", href: "https://www.amazon.com/s?k=wavelength+game", tag: "3–12" },
           { title: "Telestrations", subtitle: "Pictionary + telephone = chaos", href: "https://www.amazon.com/s?k=telestrations", tag: "4–8" },
+          { title: "Uno", subtitle: "Always a good time", href: "https://www.amazon.com/s?k=uno+card+game", tag: "Quick" },
         ],
       },
     ],
@@ -265,10 +267,9 @@ export const MOODS: Mood[] = [
         description: "Move the body, settle the brain.",
         emoji: "🏋️",
         type: "links",
-        buildLinks: (ctx) => [
+        nearby: { kinds: ["gym", "yoga"], title: "Gyms & yoga studios near you" },
+        buildLinks: () => [
           { label: "Workouts on YouTube", href: ytSearch("30 minute home workout no equipment"), kind: "watch" },
-          { label: "Yoga classes near you", href: mapsNear("yoga studio", ctx.lat, ctx.lng), kind: "map" },
-          { label: "Gyms near you", href: mapsNear("gym", ctx.lat, ctx.lng), kind: "map" },
           { label: "Workout playlist", href: spotifySearch("workout playlist 2025"), kind: "listen" },
         ],
       },
