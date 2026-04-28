@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ExternalLink, MapPin, PartyPopper, Car, BookOpen, Music, Play, Search, Sparkles } from "lucide-react";
 import { PlanShell } from "@/components/wiqo/PlanShell";
 import { AIAgent } from "@/components/wiqo/AIAgent";
+import { TrendingMovies } from "@/components/wiqo/TrendingMovies";
+import { NearbyPlaces } from "@/components/wiqo/NearbyPlaces";
+import { InstantOrder } from "@/components/wiqo/InstantOrder";
 import { findMood, findSubActivity, AI_PROMPT_KEY, ActionLink } from "@/lib/moods";
 import { getStoredLocation } from "@/lib/geolocation";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,7 +39,6 @@ const PlanResult = () => {
     if (!mood || !sub) navigate("/plan/mood");
   }, [mood, sub, navigate]);
 
-  // Persist the plan once
   useEffect(() => {
     const persist = async () => {
       if (!user || !mood || !sub || saved || !planCtx.from || !planCtx.to) return;
@@ -55,11 +57,15 @@ const PlanResult = () => {
   if (!mood || !sub) return null;
 
   const stored = getStoredLocation();
+  const city = planCtx.city || stored?.city;
+  const lat = stored?.lat;
+  const lng = stored?.lng;
+
   const links =
     sub.buildLinks?.({
-      city: planCtx.city || stored?.city,
-      lat: stored?.lat,
-      lng: stored?.lng,
+      city,
+      lat,
+      lng,
       dateRange:
         planCtx.from && planCtx.to
           ? `${format(parseISO(planCtx.from), "MMM d")} – ${format(parseISO(planCtx.to), "MMM d")}`
@@ -87,7 +93,6 @@ const PlanResult = () => {
           <ArrowLeft className="h-4 w-4" /> Pick something else
         </button>
 
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
@@ -102,10 +107,17 @@ const PlanResult = () => {
           <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">{sub.description}</p>
         </motion.div>
 
-        {/* AI-driven activity */}
+        {/* AI-driven (now two-way chat) */}
         {aiKey && (
           <div className="mb-10">
-            <AIAgent activity={aiKey} dateRange={dateLabel} />
+            <AIAgent activity={aiKey} dateRange={dateLabel} city={city} />
+          </div>
+        )}
+
+        {/* Real-time trending movies */}
+        {sub.trendingMovies && (
+          <div className="mb-10">
+            <TrendingMovies city={city} />
           </div>
         )}
 
@@ -170,25 +182,25 @@ const PlanResult = () => {
           </div>
         )}
 
-        {/* Always-visible utility links */}
-        <div className="mb-10">
-          <h2 className="font-display text-2xl mb-4">Get there</h2>
-          <div className="flex flex-wrap gap-3">
-            <a href="https://m.uber.com/" target="_blank" rel="noreferrer" className="rounded-full bg-foreground text-background px-5 py-2.5 text-sm inline-flex items-center gap-2 hover:opacity-90">
-              <Car className="h-4 w-4" /> Open Uber
-            </a>
-            <a href="https://book.olacabs.com/" target="_blank" rel="noreferrer" className="rounded-full bg-card border border-border px-5 py-2.5 text-sm inline-flex items-center gap-2 hover:bg-muted">
-              <Car className="h-4 w-4" /> Open Ola
-            </a>
-            <a
-              href={`https://www.google.com/maps/search/${encodeURIComponent(planCtx.city || "")}`}
-              target="_blank" rel="noreferrer"
-              className="rounded-full bg-card border border-border px-5 py-2.5 text-sm inline-flex items-center gap-2 hover:bg-muted"
-            >
-              <MapPin className="h-4 w-4" /> Open in Maps
-            </a>
+        {/* Instant order strip (game nights) */}
+        {sub.instantOrder && (
+          <div className="mb-10">
+            <InstantOrder />
           </div>
-        </div>
+        )}
+
+        {/* Real nearby places — pick one, get ride links */}
+        {sub.nearby && (
+          <div className="mb-10">
+            <NearbyPlaces
+              kind={sub.nearby.kinds}
+              title={sub.nearby.title}
+              lat={lat}
+              lng={lng}
+              city={city}
+            />
+          </div>
+        )}
 
         {/* Finish */}
         <div className="rounded-3xl bg-card border border-border p-8 shadow-card text-center">
