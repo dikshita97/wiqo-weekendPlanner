@@ -60,16 +60,12 @@ export const MOODS: Mood[] = [
         description: "A perfectly soft evening, screen-lit.",
         emoji: "🎬",
         type: "links",
+        trendingMovies: true,
+        nearby: { kinds: ["cinema"], title: "Theatres near you" },
         buildLinks: () => [
           { label: "Open Netflix", href: "https://www.netflix.com/browse", kind: "watch" },
+          { label: "Open Prime Video", href: "https://www.primevideo.com/", kind: "watch" },
           { label: "Find on JustWatch", href: "https://www.justwatch.com/", kind: "search" },
-          { label: "Top weekend picks", href: googleSearch("best feel good movies to watch this weekend"), kind: "search" },
-        ],
-        curated: [
-          { title: "Past Lives", subtitle: "Quiet, devastating, beautiful", href: "https://www.netflix.com/search?q=Past+Lives", tag: "Drama" },
-          { title: "Paddington 2", subtitle: "Pure serotonin, no notes", href: "https://www.netflix.com/search?q=Paddington+2", tag: "Comfort" },
-          { title: "The Grand Budapest Hotel", subtitle: "Visual candy, witty heart", href: "https://www.netflix.com/search?q=Grand+Budapest+Hotel", tag: "Whimsy" },
-          { title: "Spirited Away", subtitle: "Dreamy Ghibli classic", href: "https://www.netflix.com/search?q=Spirited+Away", tag: "Animation" },
         ],
       },
       {
