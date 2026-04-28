@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Sparkles, RefreshCw } from "lucide-react";
+import { Loader2, Sparkles, Send } from "lucide-react";
 
-type Props = { activity: string; dateRange?: string };
+type Msg = { role: "user" | "assistant"; content: string };
+type Props = { activity: string; dateRange?: string; city?: string };
 
 const renderMd = (text: string): string => {
-  // ultra-light markdown: bold, italic, line breaks
   return text
+    // links [text](url) — open in new tab
+    .replace(
+      /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noreferrer" class="underline decoration-primary-glow/60 underline-offset-2 hover:text-primary-glow">$1</a>'
+    )
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/(^|[^*])\*(?!\*)([^*\n]+)\*/g, '$1<em>$2</em>')
     .replace(/^### (.+)$/gm, '<h3 class="font-display text-xl mt-4 mb-2">$1</h3>')
@@ -17,16 +22,19 @@ const renderMd = (text: string): string => {
     .replace(/\n/g, '<br/>');
 };
 
-export const AIAgent = ({ activity, dateRange }: Props) => {
-  const [text, setText] = useState("");
+export const AIAgent = ({ activity, dateRange, city }: Props) => {
+  const [messages, setMessages] = useState<Msg[]>([]);
+  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const calledRef = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const run = async () => {
+  const stream = async (history: Msg[]) => {
     setLoading(true);
     setError(null);
-    setText("");
+    // append empty assistant message we'll fill
+    setMessages((m) => [...m, { role: "assistant", content: "" }]);
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/weekend-ai`;
       const resp = await fetch(url, {
@@ -35,7 +43,7 @@ export const AIAgent = ({ activity, dateRange }: Props) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ activity, dateRange }),
+        body: JSON.stringify({ activity, dateRange, city, messages: history }),
       });
 
       if (!resp.ok) {
@@ -66,7 +74,16 @@ export const AIAgent = ({ activity, dateRange }: Props) => {
           try {
             const parsed = JSON.parse(json);
             const c = parsed.choices?.[0]?.delta?.content;
-            if (c) setText((t) => t + c);
+            if (c) {
+              setMessages((m) => {
+                const copy = [...m];
+                const last = copy[copy.length - 1];
+                if (last?.role === "assistant") {
+                  copy[copy.length - 1] = { ...last, content: last.content + c };
+                }
+                return copy;
+              });
+            }
           } catch {
             buf = line + "\n" + buf;
             break;
@@ -75,56 +92,99 @@ export const AIAgent = ({ activity, dateRange }: Props) => {
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
+      // remove the empty assistant placeholder on error
+      setMessages((m) => (m[m.length - 1]?.role === "assistant" && !m[m.length - 1].content ? m.slice(0, -1) : m));
     } finally {
       setLoading(false);
     }
   };
 
+  // initial open
   useEffect(() => {
     if (calledRef.current) return;
     calledRef.current = true;
-    run();
+    const opener: Msg = { role: "user", content: `Give me ideas for: ${activity}.` };
+    stream([opener]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activity]);
+
+  // auto-scroll
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages]);
+
+  const send = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    const text = input.trim();
+    if (!text || loading) return;
+    const next: Msg[] = [...messages, { role: "user", content: text }];
+    setMessages(next);
+    setInput("");
+    stream(next);
+  };
+
+  // Hide the synthetic opener "Give me ideas for: X" from the rendered convo
+  const visible = messages.filter((m, i) => !(i === 0 && m.role === "user"));
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
-      className="rounded-3xl bg-dusk shadow-deep p-8 sm:p-10 text-background relative overflow-hidden"
+      className="rounded-3xl bg-dusk shadow-deep p-6 sm:p-8 text-background relative overflow-hidden"
     >
-      <div className="absolute inset-0 bg-glow opacity-30" />
+      <div className="absolute inset-0 bg-glow opacity-30 pointer-events-none" />
       <div className="relative">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-5">
           <div className="inline-flex items-center gap-2 rounded-full bg-background/10 px-3 py-1 text-xs uppercase tracking-wider">
-            <Sparkles className="h-3 w-3 text-primary-glow" /> Wiqo's AI
+            <Sparkles className="h-3 w-3 text-primary-glow" /> Chat with Wiqo
           </div>
-          <button
-            onClick={run}
-            disabled={loading}
-            className="text-xs inline-flex items-center gap-1 hover:opacity-80 disabled:opacity-50"
-          >
-            <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} /> Reroll
-          </button>
         </div>
 
-        {error ? (
-          <p className="font-display italic text-2xl text-primary-glow">{error}</p>
-        ) : (
-          <div
-            className="font-body text-base sm:text-lg leading-relaxed text-background/90 min-h-[8rem]"
-            dangerouslySetInnerHTML={{
-              __html: text
-                ? renderMd(text)
-                : '<span class="opacity-60 italic">Thinking up something good for you...</span>',
-            }}
-          />
-        )}
+        <div ref={scrollRef} className="max-h-[28rem] overflow-y-auto pr-1 space-y-4 mb-5">
+          {visible.length === 0 && !error && (
+            <div className="opacity-60 italic font-body">Thinking up something good for you...</div>
+          )}
+          {visible.map((m, i) => (
+            <div
+              key={i}
+              className={
+                m.role === "assistant"
+                  ? "font-body text-base sm:text-lg leading-relaxed text-background/90"
+                  : "ml-auto max-w-[85%] rounded-2xl bg-background/10 px-4 py-2.5 text-background/90 font-body"
+              }
+              style={m.role === "user" ? { display: "block", marginLeft: "auto", width: "fit-content" } : {}}
+              dangerouslySetInnerHTML={{
+                __html:
+                  m.content
+                    ? renderMd(m.content)
+                    : '<span class="opacity-50 italic">...</span>',
+              }}
+            />
+          ))}
+          {error && <p className="font-display italic text-xl text-primary-glow">{error}</p>}
+          {loading && (
+            <div className="inline-flex items-center gap-2 text-xs opacity-60">
+              <Loader2 className="h-3 w-3 animate-spin" /> typing...
+            </div>
+          )}
+        </div>
 
-        {loading && text && (
-          <div className="mt-4 inline-flex items-center gap-2 text-xs opacity-60">
-            <Loader2 className="h-3 w-3 animate-spin" /> still typing...
-          </div>
-        )}
+        <form onSubmit={send} className="flex gap-2 items-end">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask Wiqo anything — a tweak, a question, a follow-up..."
+            disabled={loading}
+            className="flex-1 rounded-full bg-background/10 border border-background/20 px-5 py-3 text-sm text-background placeholder:text-background/50 focus:outline-none focus:border-primary-glow/60 disabled:opacity-50"
+          />
+          <button
+            type="submit"
+            disabled={loading || !input.trim()}
+            className="rounded-full bg-primary-glow text-dusk px-4 py-3 text-sm font-medium hover:opacity-90 disabled:opacity-40 inline-flex items-center gap-1.5"
+          >
+            <Send className="h-4 w-4" />
+          </button>
+        </form>
       </div>
     </motion.div>
   );
