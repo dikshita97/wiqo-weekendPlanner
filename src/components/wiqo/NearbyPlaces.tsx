@@ -17,10 +17,13 @@ export type NearbyKind =
   | "restaurant"
   | "bakery"
   | "fast_food"
+  | "street_food"
   | "nature"
+  | "trail"
   | "attraction"
   | "museum"
   | "shopping"
+  | "club"
   | "park";
 
 type Place = {
@@ -44,9 +47,10 @@ type Props = {
 const ride = {
   uber: (lat: number, lng: number, name: string) =>
     `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${lat}&dropoff[longitude]=${lng}&dropoff[nickname]=${encodeURIComponent(name)}`,
-  ola: (lat: number, lng: number) =>
-    `https://book.olacabs.com/?drop_lat=${lat}&drop_lng=${lng}`,
-  rapido: () => `https://rapido.bike/`,
+  ola: (lat: number, lng: number, name: string) =>
+    `https://book.olacabs.com/?drop_lat=${lat}&drop_lng=${lng}&drop_name=${encodeURIComponent(name)}`,
+  rapido: (lat: number, lng: number, name: string) =>
+    `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${encodeURIComponent(name)}`,
   maps: (lat: number, lng: number, name: string) =>
     `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${encodeURIComponent(name)}`,
 };
