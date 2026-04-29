@@ -357,7 +357,7 @@ export const MOODS: Mood[] = [
         description: "Pavement, plates, perfect bites.",
         emoji: "🌮",
         type: "links",
-        nearby: { kinds: ["street_food", "fast_food"], title: "Street-food style spots near you" },
+        nearby: { kinds: ["street_food"], title: "Street-food style spots near you" },
         buildLinks: (ctx) => [
           { label: "Street food near you", href: mapsNear("street food", ctx.lat, ctx.lng), kind: "map" },
           { label: "Food markets", href: mapsNear("food market", ctx.lat, ctx.lng), kind: "map" },
