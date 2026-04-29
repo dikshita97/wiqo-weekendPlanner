@@ -143,7 +143,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { kinds, lat, lng, radiusM } = await req.json();
+    const { kinds, kind, subcategory, lat, lng, radiusM } = await req.json();
+    const requestedKinds = Array.isArray(kinds) ? kinds : [subcategory || kind].filter(Boolean);
     if (!Array.isArray(kinds) || typeof lat !== "number" || typeof lng !== "number") {
       return new Response(
         JSON.stringify({ error: "INVALID_INPUT", places: [], fallback: true }),
@@ -151,13 +152,22 @@ Deno.serve(async (req) => {
       );
     }
 
-    const query = buildQuery(kinds, lat, lng, radiusM || 5000);
+    const queryRadius = Math.min(Number(radiusM) || 2000, 5000);
+    const query = buildQuery(requestedKinds, lat, lng, queryRadius);
 
     let data: any;
     try {
       data = await fetchOverpass(query);
     } catch (e) {
       console.error("Overpass failed:", e);
+      const fallbackPlaces = await fetchNominatim(requestedKinds, lat, lng, queryRadius);
+      if (fallbackPlaces.length > 0) {
+        fallbackPlaces.sort((a, b) => a.distanceKm - b.distanceKm);
+        return new Response(
+          JSON.stringify({ places: fallbackPlaces.slice(0, 12), source: "nominatim" }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
       return new Response(
         JSON.stringify({
           error: "SERVICE_UNAVAILABLE",
@@ -195,8 +205,19 @@ Deno.serve(async (req) => {
     }
     out.sort((a, b) => a.distanceKm - b.distanceKm);
 
+    if (out.length === 0) {
+      const fallbackPlaces = await fetchNominatim(requestedKinds, lat, lng, queryRadius);
+      fallbackPlaces.sort((a, b) => a.distanceKm - b.distanceKm);
+      if (fallbackPlaces.length > 0) {
+        return new Response(
+          JSON.stringify({ places: fallbackPlaces.slice(0, 12), source: "nominatim" }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+    }
+
     return new Response(
-      JSON.stringify({ places: out.slice(0, 12) }),
+      JSON.stringify({ places: out.slice(0, 12), source: "overpass" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
