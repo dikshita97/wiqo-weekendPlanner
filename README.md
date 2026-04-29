@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="https://i.pinimg.com/736x/3a/5f/38/3a5f38cd8084942e4cf147f534a1672c.jpg" height="60" />
+<img src="https://i.pinimg.com/736x/3a/5f/38/3a5f38cd8084942e4cf147f534a1672c.jpg" height="300" width="300" />
 
-# 🌅 Wiqo
+# Wiqo
 
 ### *Plan your weekends the best way.*
 
