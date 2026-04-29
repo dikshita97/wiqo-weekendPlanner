@@ -49,17 +49,23 @@ export const AIAgent = ({ activity, dateRange, city }: Props) => {
     // append empty assistant message we'll fill
     setMessages((m) => [...m, { role: "assistant", content: "" }]);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("Please sign in to chat with Wiqo.");
+      }
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/weekend-ai`;
       const resp = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ activity, dateRange, city, messages: history }),
       });
 
       if (!resp.ok) {
+        if (resp.status === 401) throw new Error("Please sign in to chat with Wiqo.");
         if (resp.status === 429) throw new Error("Wiqo's AI is catching its breath. Try again in a moment.");
         if (resp.status === 402) throw new Error("AI credits ran out. Add some in your workspace settings.");
         throw new Error("AI couldn't respond right now.");
