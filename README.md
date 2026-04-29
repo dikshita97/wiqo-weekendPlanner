@@ -10,7 +10,6 @@
 Get an instant, beautiful plan with everything you need to actually go do it.
 
 [![Live App](https://img.shields.io/badge/✨_Try_it_live-fb923c?style=for-the-badge&logoColor=white)](https://wiqo-theweekendplanner.lovable.app)
-[![Docs](https://img.shields.io/badge/📖_Read_the_docs-1e1b4b?style=for-the-badge)](docs/DOCUMENTATION.md)
 
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
@@ -182,13 +181,6 @@ methodology · architecture · every API and tool used · edge function contract
 ---
 
 <div align="center">
-
-### 🎨 The palette
-
-![#fff7ed](https://img.shields.io/badge/cream-fff7ed?style=for-the-badge&labelColor=fff7ed&color=fff7ed)
-![#fb923c](https://img.shields.io/badge/sunset-fb923c?style=for-the-badge&labelColor=fb923c&color=fb923c)
-![#ec4899](https://img.shields.io/badge/pink-ec4899?style=for-the-badge&labelColor=ec4899&color=ec4899)
-![#1e1b4b](https://img.shields.io/badge/indigo-1e1b4b?style=for-the-badge&labelColor=1e1b4b&color=1e1b4b)
 
 ---
 
