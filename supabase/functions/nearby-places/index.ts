@@ -54,7 +54,7 @@ const buildQuery = (kinds: string[], lat: number, lng: number, radiusM = 5000) =
       parts.push(`way${tag}(around:${radiusM},${lat},${lng});`);
     }
   }
-  return `[out:json][timeout:8];(${parts.join("")});out center tags 25;`;
+  return `[out:json][timeout:8];(${parts.join("")});out tags center 25;`;
 };
 
 const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
