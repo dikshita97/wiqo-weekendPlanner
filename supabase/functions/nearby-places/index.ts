@@ -70,18 +70,25 @@ const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => 
 const ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
-  "https://overpass.openstreetmap.ru/api/interpreter",
+  "https://overpass.openstreetmap.fr/api/interpreter",
 ];
 
 async function fetchOverpass(query: string): Promise<any> {
   let lastErr: string = "";
   for (const url of ENDPOINTS) {
     try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 9000);
       const r = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "User-Agent": "WiqoWeekendPlanner/1.0",
+        },
         body: "data=" + encodeURIComponent(query),
+        signal: controller.signal,
       });
+      clearTimeout(timer);
       if (!r.ok) {
         lastErr = `${url} -> ${r.status}`;
         continue;
@@ -92,6 +99,44 @@ async function fetchOverpass(query: string): Promise<any> {
     }
   }
   throw new Error(lastErr || "All Overpass endpoints failed");
+}
+
+async function fetchNominatim(kinds: string[], lat: number, lng: number, radiusM = 5000): Promise<any[]> {
+  const delta = Math.max(0.01, radiusM / 111000);
+  const viewbox = `${lng - delta},${lat + delta},${lng + delta},${lat - delta}`;
+  const results: any[] = [];
+  const seen = new Set<string>();
+
+  for (const kind of kinds.slice(0, 3)) {
+    const q = KIND_SEARCH_TERMS[kind] || kind;
+    const url = new URL("https://nominatim.openstreetmap.org/search");
+    url.searchParams.set("format", "jsonv2");
+    url.searchParams.set("limit", "10");
+    url.searchParams.set("bounded", "1");
+    url.searchParams.set("addressdetails", "1");
+    url.searchParams.set("viewbox", viewbox);
+    url.searchParams.set("q", q);
+    const r = await fetch(url, { headers: { "User-Agent": "WiqoWeekendPlanner/1.0" } });
+    if (!r.ok) continue;
+    const data = await r.json();
+    for (const p of data || []) {
+      if (!p?.name || !p?.lat || !p?.lon) continue;
+      const key = `${p.name}-${Number(p.lat).toFixed(3)}-${Number(p.lon).toFixed(3)}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      results.push({
+        id: `nominatim-${p.place_id}`,
+        name: p.name,
+        lat: Number(p.lat),
+        lng: Number(p.lon),
+        distanceKm: haversineKm(lat, lng, Number(p.lat), Number(p.lon)),
+        address: p.display_name?.split(",").slice(1, 4).map((s: string) => s.trim()).filter(Boolean).join(", "),
+        category: p.type || kind,
+      });
+    }
+  }
+
+  return results;
 }
 
 Deno.serve(async (req) => {
