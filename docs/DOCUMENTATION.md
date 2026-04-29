@@ -1,8 +1,8 @@
-# Wiqo Weekend Planner — Founder Reference Documentation
+# Wiqo Weekend Planner
 
 ## 1. Product overview
 
-Wiqo is a weekend-planning web application designed to help users quickly choose and execute a weekend plan based on their mood. Instead of giving only generic suggestions, the app combines mood-based planning, real nearby places, direct action links, AI assistance, movie discovery, delivery links, and transport links.
+Wiqo is a weekend-planning web application designed to help users quickly choose and execute a weekend plan based on their mood. Instead of giving only generic suggestions, the app combines mood-based planning, real nearby places, direct action links, AI assistance(FREINDLY), movie discovery, delivery links, and transport links.
 
 The core promise is: choose a vibe, choose a sub-activity, and Wiqo turns it into an executable weekend plan.
 
