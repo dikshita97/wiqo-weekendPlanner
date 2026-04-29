@@ -200,6 +200,7 @@ export const MOODS: Mood[] = [
         description: "Live music, comedy, anything loud.",
         emoji: "🎤",
         type: "links",
+        nearby: { kinds: ["theatre", "bar", "nightclub"], title: "Event venues near you" },
         buildLinks: (ctx) => {
           const dateBit = ctx.dateRange ? ` ${ctx.dateRange}` : " this weekend";
           return [
@@ -343,6 +344,7 @@ export const MOODS: Mood[] = [
         description: "A latte, a croissant, a discovery.",
         emoji: "☕",
         type: "links",
+        nearby: { kinds: ["cafe"], title: "Cafes near you" },
         buildLinks: (ctx) => [
           { label: "New cafes near you", href: mapsNear("new specialty coffee cafe", ctx.lat, ctx.lng), kind: "map" },
           { label: "Top-rated cafes", href: mapsNear("best rated cafe", ctx.lat, ctx.lng), kind: "map" },
@@ -354,6 +356,7 @@ export const MOODS: Mood[] = [
         description: "Pavement, plates, perfect bites.",
         emoji: "🌮",
         type: "links",
+        nearby: { kinds: ["fast_food", "restaurant"], title: "Street-food style spots near you" },
         buildLinks: (ctx) => [
           { label: "Street food near you", href: mapsNear("street food", ctx.lat, ctx.lng), kind: "map" },
           { label: "Food markets", href: mapsNear("food market", ctx.lat, ctx.lng), kind: "map" },
@@ -377,6 +380,7 @@ export const MOODS: Mood[] = [
         description: "One scoop here, one slice there.",
         emoji: "🍰",
         type: "links",
+        nearby: { kinds: ["bakery", "cafe"], title: "Dessert spots near you" },
         buildLinks: (ctx) => [
           { label: "Dessert spots near you", href: mapsNear("dessert", ctx.lat, ctx.lng), kind: "map" },
           { label: "Best ice cream nearby", href: mapsNear("artisan ice cream", ctx.lat, ctx.lng), kind: "map" },
