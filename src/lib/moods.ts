@@ -123,6 +123,7 @@ export const MOODS: Mood[] = [
         description: "Open road, good playlist, no plan.",
         emoji: "🚗",
         type: "links",
+        nearby: { kinds: ["attraction", "park", "nature"], title: "Scenic spots near you" },
         buildLinks: (ctx) => [
           { label: "Rent on Zoomcar", href: "https://www.zoomcar.com/", kind: "book" },
           { label: "Rent on Turo", href: "https://turo.com/", kind: "book" },
@@ -136,6 +137,7 @@ export const MOODS: Mood[] = [
         description: "Boots on. Phone off. Mountains, please.",
         emoji: "🥾",
         type: "links",
+        nearby: { kinds: ["park", "nature", "attraction"], title: "Outdoor places near you" },
         buildLinks: (ctx) => [
           { label: "Trails on AllTrails", href: "https://www.alltrails.com/", kind: "search" },
           { label: "Trekking spots near you", href: mapsNear("trekking trails", ctx.lat, ctx.lng), kind: "map" },
@@ -148,6 +150,7 @@ export const MOODS: Mood[] = [
         description: "Wiqo's AI will surface hidden gems.",
         emoji: "📍",
         type: "ai",
+        nearby: { kinds: ["attraction", "museum", "park"], title: "Places to discover near you" },
       },
       {
         id: "trying-something-new",
@@ -155,6 +158,7 @@ export const MOODS: Mood[] = [
         description: "Let Wiqo's AI dare you a little.",
         emoji: "✨",
         type: "ai",
+        nearby: { kinds: ["theatre", "attraction", "museum"], title: "New experiences near you" },
       },
     ],
   },
@@ -196,6 +200,7 @@ export const MOODS: Mood[] = [
         description: "Live music, comedy, anything loud.",
         emoji: "🎤",
         type: "links",
+        nearby: { kinds: ["theatre", "bar", "nightclub"], title: "Event venues near you" },
         buildLinks: (ctx) => {
           const dateBit = ctx.dateRange ? ` ${ctx.dateRange}` : " this weekend";
           return [
@@ -339,6 +344,7 @@ export const MOODS: Mood[] = [
         description: "A latte, a croissant, a discovery.",
         emoji: "☕",
         type: "links",
+        nearby: { kinds: ["cafe"], title: "Cafes near you" },
         buildLinks: (ctx) => [
           { label: "New cafes near you", href: mapsNear("new specialty coffee cafe", ctx.lat, ctx.lng), kind: "map" },
           { label: "Top-rated cafes", href: mapsNear("best rated cafe", ctx.lat, ctx.lng), kind: "map" },
@@ -350,6 +356,7 @@ export const MOODS: Mood[] = [
         description: "Pavement, plates, perfect bites.",
         emoji: "🌮",
         type: "links",
+        nearby: { kinds: ["fast_food", "restaurant"], title: "Street-food style spots near you" },
         buildLinks: (ctx) => [
           { label: "Street food near you", href: mapsNear("street food", ctx.lat, ctx.lng), kind: "map" },
           { label: "Food markets", href: mapsNear("food market", ctx.lat, ctx.lng), kind: "map" },
@@ -373,6 +380,7 @@ export const MOODS: Mood[] = [
         description: "One scoop here, one slice there.",
         emoji: "🍰",
         type: "links",
+        nearby: { kinds: ["bakery", "cafe"], title: "Dessert spots near you" },
         buildLinks: (ctx) => [
           { label: "Dessert spots near you", href: mapsNear("dessert", ctx.lat, ctx.lng), kind: "map" },
           { label: "Best ice cream nearby", href: mapsNear("artisan ice cream", ctx.lat, ctx.lng), kind: "map" },

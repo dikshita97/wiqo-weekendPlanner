@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type NearbyKind =
   | "cinema"
+  | "theatre"
   | "library"
   | "stationery"
   | "spa"
@@ -14,6 +15,12 @@ export type NearbyKind =
   | "yoga"
   | "cafe"
   | "restaurant"
+  | "bakery"
+  | "fast_food"
+  | "nature"
+  | "attraction"
+  | "museum"
+  | "shopping"
   | "park";
 
 type Place = {
@@ -34,44 +41,6 @@ type Props = {
   city?: string;
 };
 
-// Overpass query builders per kind
-const KIND_FILTERS: Record<NearbyKind, string> = {
-  cinema: 'amenity=cinema',
-  library: 'amenity=library',
-  stationery: 'shop=stationery',
-  spa: 'leisure=spa|shop=massage|amenity=spa',
-  nightclub: 'amenity=nightclub',
-  bar: 'amenity=bar|amenity=pub',
-  gym: 'leisure=fitness_centre|leisure=sports_centre',
-  yoga: 'sport=yoga|leisure=fitness_centre',
-  cafe: 'amenity=cafe',
-  restaurant: 'amenity=restaurant',
-  park: 'leisure=park',
-};
-
-const buildOverpassQuery = (kinds: NearbyKind[], lat: number, lng: number, radiusM = 4000) => {
-  const parts: string[] = [];
-  for (const k of kinds) {
-    const filter = KIND_FILTERS[k];
-    for (const f of filter.split("|")) {
-      const [key, val] = f.split("=");
-      parts.push(`node["${key}"="${val}"](around:${radiusM},${lat},${lng});`);
-      parts.push(`way["${key}"="${val}"](around:${radiusM},${lat},${lng});`);
-    }
-  }
-  return `[out:json][timeout:20];(${parts.join("")});out center 30;`;
-};
-
-const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-};
-
 const ride = {
   uber: (lat: number, lng: number, name: string) =>
     `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${lat}&dropoff[longitude]=${lng}&dropoff[nickname]=${encodeURIComponent(name)}`,
@@ -88,6 +57,22 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Place | null>(null);
+  const mapPoints = useMemo(() => {
+    if (places.length === 0) return [];
+    const lats = places.map((p) => p.lat);
+    const lngs = places.map((p) => p.lng);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+    const latSpan = Math.max(maxLat - minLat, 0.01);
+    const lngSpan = Math.max(maxLng - minLng, 0.01);
+    return places.map((p) => ({
+      ...p,
+      x: Math.min(92, Math.max(8, ((p.lng - minLng) / lngSpan) * 84 + 8)),
+      y: Math.min(92, Math.max(8, 92 - ((p.lat - minLat) / latSpan) * 84)),
+    }));
+  }, [places]);
 
   const load = async () => {
     if (!lat || !lng) {
@@ -101,7 +86,7 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
         body: { kinds, lat, lng, radiusM: 5000 },
       });
       if (fnErr) throw new Error(fnErr.message || "Couldn't reach the map service.");
-      const found = (data?.places || []) as Place[];
+      const found = ((data?.places || []) as Place[]).filter((place) => place.name && place.lat && place.lng);
       setPlaces(found);
       if (data?.fallback) {
         setError("Map service is busy right now. Try refreshing in a moment.");
@@ -148,7 +133,38 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
           <Loader2 className="h-4 w-4 animate-spin" /> Searching nearby...
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 gap-3 mb-4">
+        <>
+          {mapPoints.length > 0 && (
+            <div className="relative h-64 overflow-hidden rounded-2xl border border-border bg-muted mb-4 shadow-card">
+              <div className="absolute inset-0 opacity-60 bg-[linear-gradient(hsl(var(--border))_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border))_1px,transparent_1px)] bg-[size:32px_32px]" />
+              <div className="absolute left-4 top-4 rounded-full bg-card/90 px-3 py-1 text-xs text-muted-foreground border border-border">
+                Tap a marker to select a place
+              </div>
+              {mapPoints.map((p, i) => {
+                const isSel = selected?.id === p.id;
+                return (
+                  <button
+                    key={`map-${p.id}`}
+                    onClick={() => setSelected(p)}
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all ${isSel ? "z-20 scale-110" : "z-10 hover:scale-105"}`}
+                    style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                    aria-label={`Select ${p.name}`}
+                  >
+                    <span className={`flex h-9 w-9 items-center justify-center rounded-full shadow-soft ${isSel ? "bg-sunset text-primary-foreground" : "bg-card text-primary border border-border"}`}>
+                      {i + 1}
+                    </span>
+                    {isSel && (
+                      <span className="absolute left-1/2 top-10 w-40 -translate-x-1/2 rounded-xl bg-card border border-border px-3 py-2 text-xs text-foreground shadow-card">
+                        {p.name}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="grid sm:grid-cols-2 gap-3 mb-4">
           {places.map((p, i) => {
             const isSel = selected?.id === p.id;
             return (
@@ -177,7 +193,8 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
               </motion.button>
             );
           })}
-        </div>
+          </div>
+        </>
       )}
 
       <AnimatePresence>
