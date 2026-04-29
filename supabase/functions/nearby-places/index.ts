@@ -40,9 +40,10 @@ const KIND_PARTS: Record<string, QueryPart[]> = {
   bakery: [{ selector: '["shop"="bakery"]' }],
   fast_food: [{ selector: '["amenity"="fast_food"]' }, { selector: '["amenity"="food_court"]' }],
   street_food: [
+    { selector: '["amenity"="fast_food"]', radius: 4000 },
     { selector: '["amenity"="food_court"]' },
     { selector: '["amenity"="marketplace"]' },
-    { selector: '["shop"~"food|kiosk|confectionery"]' },
+    { selector: '["shop"="kiosk"]' },
     { selector: '["cuisine"~"street_food|chaat|kebab|roll|momo|dosa|vada|pav|snack", i]' },
   ],
   park: [{ selector: '["leisure"="park"]' }],
