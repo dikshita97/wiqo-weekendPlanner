@@ -1,13 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Sparkles, Send } from "lucide-react";
+import DOMPurify from "dompurify";
+import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Props = { activity: string; dateRange?: string; city?: string };
 
-const renderMd = (text: string): string => {
+const escapeHtml = (s: string): string =>
+  s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const renderMd = (raw: string): string => {
+  // Escape first so any HTML/script in AI output or user input is inert,
+  // then run our markdown-ish regex transformations on the safe string.
+  const text = escapeHtml(raw);
   return text
-    // links [text](url) — open in new tab
+    // links [text](url) — open in new tab. URL is already escaped; only allow http(s).
     .replace(
       /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
       '<a href="$2" target="_blank" rel="noreferrer" class="underline decoration-primary-glow/60 underline-offset-2 hover:text-primary-glow">$1</a>'
@@ -36,17 +49,23 @@ export const AIAgent = ({ activity, dateRange, city }: Props) => {
     // append empty assistant message we'll fill
     setMessages((m) => [...m, { role: "assistant", content: "" }]);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("Please sign in to chat with Wiqo.");
+      }
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/weekend-ai`;
       const resp = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ activity, dateRange, city, messages: history }),
       });
 
       if (!resp.ok) {
+        if (resp.status === 401) throw new Error("Please sign in to chat with Wiqo.");
         if (resp.status === 429) throw new Error("Wiqo's AI is catching its breath. Try again in a moment.");
         if (resp.status === 402) throw new Error("AI credits ran out. Add some in your workspace settings.");
         throw new Error("AI couldn't respond right now.");
@@ -153,10 +172,13 @@ export const AIAgent = ({ activity, dateRange, city }: Props) => {
               }
               style={m.role === "user" ? { display: "block", marginLeft: "auto", width: "fit-content" } : {}}
               dangerouslySetInnerHTML={{
-                __html:
-                  m.content
-                    ? renderMd(m.content)
-                    : '<span class="opacity-50 italic">...</span>',
+                __html: m.content
+                  ? DOMPurify.sanitize(renderMd(m.content), {
+                      ALLOWED_TAGS: ["a", "strong", "em", "h1", "h2", "h3", "li", "br", "span"],
+                      ALLOWED_ATTR: ["href", "target", "rel", "class"],
+                      ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:)/i,
+                    })
+                  : '<span class="opacity-50 italic">...</span>',
               }}
             />
           ))}
