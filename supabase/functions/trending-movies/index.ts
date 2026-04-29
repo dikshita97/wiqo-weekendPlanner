@@ -1,5 +1,7 @@
 // Wiqo trending movies — uses Lovable AI to surface currently-trending movies
 // across streaming platforms and returns structured JSON via tool calling.
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.95.0";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
