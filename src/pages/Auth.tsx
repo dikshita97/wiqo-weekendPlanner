@@ -11,7 +11,7 @@ const emailSchema = z.string().trim().email({ message: "Enter a valid email addr
 const phoneSchema = z.string().trim().regex(/^\+?[0-9\s\-()]{7,20}$/, { message: "Enter a valid phone number." });
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters.").max(72);
 
-type Mode = "signin" | "signup";
+type Mode = "signin" | "signup" | "forgot";
 type IdType = "email" | "phone";
 
 const Auth = () => {
@@ -37,6 +37,20 @@ const Auth = () => {
       } else {
         email = `${phone!.replace(/[^0-9]/g, "")}@phone.wiqo.app`;
       }
+
+      if (mode === "forgot") {
+        if (idType === "phone") {
+          throw new Error("Use email to reset your password.");
+        }
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("Check your inbox for a reset link 💌");
+        setMode("signin");
+        return;
+      }
+
       const pwd = passwordSchema.parse(password);
 
       if (mode === "signup") {
@@ -85,12 +99,18 @@ const Auth = () => {
             <h1 className="font-display text-5xl sm:text-6xl">
               {mode === "signup" ? (
                 <>Make it <span className="italic text-gradient-sunset">official.</span></>
+              ) : mode === "forgot" ? (
+                <>Forgot your <span className="italic text-gradient-sunset">password?</span></>
               ) : (
                 <>Welcome <span className="italic text-gradient-sunset">back.</span></>
               )}
             </h1>
             <p className="mt-3 text-muted-foreground">
-              {mode === "signup" ? "Your weekend self will thank you." : "Let's plan something good."}
+              {mode === "signup"
+                ? "Your weekend self will thank you."
+                : mode === "forgot"
+                ? "We'll send you a reset link. Check your inbox."
+                : "Let's plan something good."}
             </p>
           </div>
 
@@ -140,37 +160,73 @@ const Auth = () => {
                 />
               </div>
 
-              <div>
-                <label className="text-xs uppercase tracking-wider text-muted-foreground">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  minLength={6}
-                  className="mt-1 w-full rounded-xl border border-input bg-background px-4 py-3 outline-none focus:ring-2 focus:ring-primary/40 transition"
-                />
-              </div>
+              {mode !== "forgot" && (
+                <div>
+                  <label className="text-xs uppercase tracking-wider text-muted-foreground">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    minLength={6}
+                    className="mt-1 w-full rounded-xl border border-input bg-background px-4 py-3 outline-none focus:ring-2 focus:ring-primary/40 transition"
+                  />
+                  {mode === "signin" && (
+                    <div className="mt-2 text-right">
+                      <button
+                        type="button"
+                        onClick={() => setMode("forgot")}
+                        className="text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full rounded-full bg-sunset py-4 font-medium text-primary-foreground shadow-soft hover:shadow-glow transition-all disabled:opacity-60 inline-flex items-center justify-center gap-2"
               >
-                {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : mode === "signup" ? "Create account" : "Sign in"}
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : mode === "signup" ? (
+                  "Create account"
+                ) : mode === "forgot" ? (
+                  "Send reset link"
+                ) : (
+                  "Sign in"
+                )}
               </button>
             </form>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              {mode === "signup" ? "Already weekend-ready?" : "New to Wiqo?"}{" "}
-              <button
-                type="button"
-                onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-                className="text-foreground font-medium underline-offset-4 hover:underline"
-              >
-                {mode === "signup" ? "Sign in" : "Create an account"}
-              </button>
+              {mode === "forgot" ? (
+                <>
+                  Remembered it?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setMode("signin")}
+                    className="text-foreground font-medium underline-offset-4 hover:underline"
+                  >
+                    Back to sign in
+                  </button>
+                </>
+              ) : (
+                <>
+                  {mode === "signup" ? "Already weekend-ready?" : "New to Wiqo?"}{" "}
+                  <button
+                    type="button"
+                    onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+                    className="text-foreground font-medium underline-offset-4 hover:underline"
+                  >
+                    {mode === "signup" ? "Sign in" : "Create an account"}
+                  </button>
+                </>
+              )}
             </p>
           </div>
 

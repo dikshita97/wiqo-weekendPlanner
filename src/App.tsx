@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import PlanStart from "./pages/PlanStart";
 import PlanMood from "./pages/PlanMood";
 import PlanSubActivity from "./pages/PlanSubActivity";
@@ -25,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/plan" element={<PlanStart />} />
             <Route path="/plan/mood" element={<PlanMood />} />
             <Route path="/plan/mood/:moodId" element={<PlanSubActivity />} />
