@@ -1,13 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, Sparkles, Send } from "lucide-react";
+import DOMPurify from "dompurify";
+import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Props = { activity: string; dateRange?: string; city?: string };
 
-const renderMd = (text: string): string => {
+const escapeHtml = (s: string): string =>
+  s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const renderMd = (raw: string): string => {
+  // Escape first so any HTML/script in AI output or user input is inert,
+  // then run our markdown-ish regex transformations on the safe string.
+  const text = escapeHtml(raw);
   return text
-    // links [text](url) — open in new tab
+    // links [text](url) — open in new tab. URL is already escaped; only allow http(s).
     .replace(
       /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
       '<a href="$2" target="_blank" rel="noreferrer" class="underline decoration-primary-glow/60 underline-offset-2 hover:text-primary-glow">$1</a>'
