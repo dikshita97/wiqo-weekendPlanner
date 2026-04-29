@@ -11,7 +11,7 @@ const emailSchema = z.string().trim().email({ message: "Enter a valid email addr
 const phoneSchema = z.string().trim().regex(/^\+?[0-9\s\-()]{7,20}$/, { message: "Enter a valid phone number." });
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters.").max(72);
 
-type Mode = "signin" | "signup";
+type Mode = "signin" | "signup" | "forgot";
 type IdType = "email" | "phone";
 
 const Auth = () => {
@@ -37,6 +37,20 @@ const Auth = () => {
       } else {
         email = `${phone!.replace(/[^0-9]/g, "")}@phone.wiqo.app`;
       }
+
+      if (mode === "forgot") {
+        if (idType === "phone") {
+          throw new Error("Use email to reset your password.");
+        }
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        toast.success("Check your inbox for a reset link 💌");
+        setMode("signin");
+        return;
+      }
+
       const pwd = passwordSchema.parse(password);
 
       if (mode === "signup") {
