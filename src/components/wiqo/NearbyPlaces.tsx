@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Loader2, Star, Car, Navigation, Bike, ChevronRight, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export type NearbyKind =
   | "cinema"
@@ -96,44 +97,17 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
     setLoading(true);
     setError(null);
     try {
-      const q = buildOverpassQuery(kinds, lat, lng, 5000);
-      const r = await fetch("https://overpass-api.de/api/interpreter", {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: q,
+      const { data, error: fnErr } = await supabase.functions.invoke("nearby-places", {
+        body: { kinds, lat, lng, radiusM: 5000 },
       });
-      if (!r.ok) throw new Error("Couldn't reach the map service.");
-      const data = await r.json();
-      const els = (data.elements || []) as Array<{
-        id: number; type: string; lat?: number; lon?: number; center?: { lat: number; lon: number }; tags?: Record<string, string>;
-      }>;
-      const out: Place[] = [];
-      const seen = new Set<string>();
-      for (const e of els) {
-        const plat = e.lat ?? e.center?.lat;
-        const plng = e.lon ?? e.center?.lon;
-        const name = e.tags?.name;
-        if (!plat || !plng || !name) continue;
-        const key = name + plat.toFixed(3);
-        if (seen.has(key)) continue;
-        seen.add(key);
-        out.push({
-          id: `${e.type}-${e.id}`,
-          name,
-          lat: plat,
-          lng: plng,
-          distanceKm: haversineKm(lat, lng, plat, plng),
-          address:
-            e.tags?.["addr:street"]
-              ? [e.tags["addr:housenumber"], e.tags["addr:street"], e.tags["addr:suburb"] || e.tags["addr:city"]]
-                  .filter(Boolean)
-                  .join(", ")
-              : undefined,
-        });
+      if (fnErr) throw new Error(fnErr.message || "Couldn't reach the map service.");
+      const found = (data?.places || []) as Place[];
+      setPlaces(found);
+      if (data?.fallback) {
+        setError("Map service is busy right now. Try refreshing in a moment.");
+      } else if (found.length === 0) {
+        setError("Nothing came back nearby. Try a different category or widen your search.");
       }
-      out.sort((a, b) => a.distanceKm - b.distanceKm);
-      setPlaces(out.slice(0, 10));
-      if (out.length === 0) setError("Nothing came back nearby. Try a different category or zoom out.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Search failed.");
     } finally {
