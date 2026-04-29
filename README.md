@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/-%F0%9F%8C%85%20WIQO-fb923c?style=for-the-badge&labelColor=1e1b4b&color=ec4899" alt="Wiqo" height="60" />
+<img src="https://i.pinimg.com/736x/3a/5f/38/3a5f38cd8084942e4cf147f534a1672c.jpg" height="60" />
 
 # 🌅 Wiqo
 
@@ -187,5 +187,7 @@ methodology · architecture · every API and tool used · edge function contract
 **Made with 🧡 for weekends that don't suck.**
 
 *If Wiqo helped your weekend, give it a ⭐*
+
+***By Dikshita***
 
 </div>
