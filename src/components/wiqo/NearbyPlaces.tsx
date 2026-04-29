@@ -48,9 +48,9 @@ const ride = {
   uber: (lat: number, lng: number, name: string) =>
     `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${lat}&dropoff[longitude]=${lng}&dropoff[nickname]=${encodeURIComponent(name)}`,
   ola: (lat: number, lng: number, name: string) =>
-    `https://book.olacabs.com/?drop_lat=${lat}&drop_lng=${lng}&drop_name=${encodeURIComponent(name)}`,
+    `https://book.olacabs.com/?pickup=current_location&drop_lat=${lat}&drop_lng=${lng}&drop_name=${encodeURIComponent(name)}`,
   rapido: (lat: number, lng: number, name: string) =>
-    `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${encodeURIComponent(name)}`,
+    `intent://booking?dropLat=${lat}&dropLng=${lng}&dropName=${encodeURIComponent(name)}#Intent;scheme=rapido;package=com.rapido.passenger;S.browser_fallback_url=${encodeURIComponent(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`)};end`,
   maps: (lat: number, lng: number, name: string) =>
     `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${encodeURIComponent(name)}`,
 };
