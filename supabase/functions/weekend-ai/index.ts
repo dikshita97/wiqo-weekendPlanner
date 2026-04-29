@@ -1,4 +1,6 @@
 // Wiqo AI agent — friendly weekend idea generator (streaming, two-way chat)
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.95.0";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
