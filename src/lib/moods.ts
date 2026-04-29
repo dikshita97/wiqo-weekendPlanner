@@ -137,7 +137,7 @@ export const MOODS: Mood[] = [
         description: "Boots on. Phone off. Mountains, please.",
         emoji: "🥾",
         type: "links",
-        nearby: { kinds: ["park", "nature", "attraction"], title: "Outdoor places near you" },
+        nearby: { kinds: ["trail"], title: "Trails & hiking spots near you" },
         buildLinks: (ctx) => [
           { label: "Trails on AllTrails", href: "https://www.alltrails.com/", kind: "search" },
           { label: "Trekking spots near you", href: mapsNear("trekking trails", ctx.lat, ctx.lng), kind: "map" },
@@ -178,7 +178,8 @@ export const MOODS: Mood[] = [
         emoji: "🪩",
         type: "links",
         nearby: { kinds: ["nightclub", "bar"], title: "Clubs & bars near you" },
-        buildLinks: () => [
+        buildLinks: (ctx) => [
+          { label: "Clubs near me", href: mapsNear("clubs and nightclubs", ctx.lat, ctx.lng), kind: "map" },
           { label: "Tonight's party playlist", href: spotifySearch("party playlist 2025"), kind: "listen" },
           { label: "Pre-game cocktails", href: googleSearch("easy 3 ingredient cocktails recipes"), kind: "search" },
         ],
@@ -356,7 +357,7 @@ export const MOODS: Mood[] = [
         description: "Pavement, plates, perfect bites.",
         emoji: "🌮",
         type: "links",
-        nearby: { kinds: ["fast_food", "restaurant"], title: "Street-food style spots near you" },
+        nearby: { kinds: ["street_food", "fast_food"], title: "Street-food style spots near you" },
         buildLinks: (ctx) => [
           { label: "Street food near you", href: mapsNear("street food", ctx.lat, ctx.lng), kind: "map" },
           { label: "Food markets", href: mapsNear("food market", ctx.lat, ctx.lng), kind: "map" },
