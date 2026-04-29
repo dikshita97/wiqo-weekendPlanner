@@ -40,9 +40,9 @@ const KIND_PARTS: Record<string, QueryPart[]> = {
   bakery: [{ selector: '["shop"="bakery"]' }],
   fast_food: [{ selector: '["amenity"="fast_food"]' }, { selector: '["amenity"="food_court"]' }],
   street_food: [
-    { selector: '["amenity"="fast_food"]' },
     { selector: '["amenity"="food_court"]' },
-    { selector: '["shop"~"food|street_vendor"]' },
+    { selector: '["amenity"="marketplace"]' },
+    { selector: '["shop"~"food|kiosk|confectionery"]' },
     { selector: '["cuisine"~"street_food|chaat|kebab|roll|momo|dosa|vada|pav|snack", i]' },
   ],
   park: [{ selector: '["leisure"="park"]' }],
@@ -113,6 +113,8 @@ const ENDPOINTS = [
   "https://overpass.kumi.systems/api/interpreter",
   "https://overpass.openstreetmap.fr/api/interpreter",
 ];
+
+const CHAIN_BLOCKLIST = /\b(mcdonald'?s|kfc|subway|domino'?s|burger king|pizza hut|starbucks)\b/i;
 
 async function fetchOverpass(query: string): Promise<any> {
   let lastErr = "";
@@ -255,6 +257,7 @@ Deno.serve(async (req) => {
     }
 
     out = out
+      .filter((place) => !(requestedKinds.includes("street_food") && CHAIN_BLOCKLIST.test(place.name)))
       .filter((place) => Number.isFinite(place.distanceKm))
       .sort((a, b) => a.distanceKm - b.distanceKm)
       .slice(0, 12);
