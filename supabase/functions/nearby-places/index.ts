@@ -2,6 +2,7 @@ import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 
 const KIND_FILTERS: Record<string, string> = {
   cinema: "amenity=cinema",
+  theatre: "amenity=theatre",
   library: "amenity=library",
   stationery: "shop=stationery",
   spa: "leisure=spa|shop=massage|amenity=spa",
@@ -11,7 +12,34 @@ const KIND_FILTERS: Record<string, string> = {
   yoga: "sport=yoga|leisure=fitness_centre",
   cafe: "amenity=cafe",
   restaurant: "amenity=restaurant",
+  bakery: "shop=bakery",
+  fast_food: "amenity=fast_food",
   park: "leisure=park",
+  nature: "natural=water|leisure=nature_reserve",
+  attraction: "tourism=attraction",
+  museum: "tourism=museum",
+  shopping: "shop",
+};
+
+const KIND_SEARCH_TERMS: Record<string, string> = {
+  cinema: "cinema",
+  theatre: "theatre",
+  library: "library",
+  stationery: "stationery shop",
+  spa: "spa massage",
+  nightclub: "nightclub",
+  bar: "bar pub",
+  gym: "gym fitness centre",
+  yoga: "yoga studio",
+  cafe: "cafe",
+  restaurant: "restaurant",
+  bakery: "bakery dessert",
+  fast_food: "fast food street food",
+  park: "park",
+  nature: "lake garden nature",
+  attraction: "tourist attraction",
+  museum: "museum",
+  shopping: "shopping mall market",
 };
 
 const buildQuery = (kinds: string[], lat: number, lng: number, radiusM = 5000) => {
@@ -21,11 +49,12 @@ const buildQuery = (kinds: string[], lat: number, lng: number, radiusM = 5000) =
     if (!filter) continue;
     for (const f of filter.split("|")) {
       const [key, val] = f.split("=");
-      parts.push(`node["${key}"="${val}"](around:${radiusM},${lat},${lng});`);
-      parts.push(`way["${key}"="${val}"](around:${radiusM},${lat},${lng});`);
+      const tag = val ? `["${key}"="${val}"]` : `["${key}"]`;
+      parts.push(`node${tag}(around:${radiusM},${lat},${lng});`);
+      parts.push(`way${tag}(around:${radiusM},${lat},${lng});`);
     }
   }
-  return `[out:json][timeout:20];(${parts.join("")});out center 30;`;
+  return `[out:json][timeout:8];(${parts.join("")});out center tags 25;`;
 };
 
 const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
