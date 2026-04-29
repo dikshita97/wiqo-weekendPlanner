@@ -117,9 +117,15 @@ async function fetchNominatim(kinds: string[], lat: number, lng: number, radiusM
     url.searchParams.set("addressdetails", "1");
     url.searchParams.set("viewbox", viewbox);
     url.searchParams.set("q", q);
-    const r = await fetch(url, { headers: { "User-Agent": "WiqoWeekendPlanner/1.0" } });
-    if (!r.ok) continue;
-    const data = await r.json();
+    let data: any[] = [];
+    try {
+      const r = await fetch(url, { headers: { "User-Agent": "WiqoWeekendPlanner/1.0" } });
+      if (!r.ok) continue;
+      data = await r.json();
+    } catch (e) {
+      console.error("Nominatim fallback failed:", e);
+      continue;
+    }
     for (const p of data || []) {
       if (!p?.name || !p?.lat || !p?.lon) continue;
       const key = `${p.name}-${Number(p.lat).toFixed(3)}-${Number(p.lon).toFixed(3)}`;
