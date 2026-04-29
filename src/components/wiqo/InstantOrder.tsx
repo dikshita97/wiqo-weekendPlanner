@@ -1,9 +1,9 @@
 import { ShoppingBag, ExternalLink } from "lucide-react";
 
 const SERVICES = [
-  { name: "Blinkit", href: "https://blinkit.com/s/?q=board%20games", color: "bg-yellow-400 text-zinc-900" },
-  { name: "Zepto", href: "https://www.zeptonow.com/search?query=board%20games", color: "bg-violet-600 text-white" },
-  { name: "Instamart", href: "https://www.swiggy.com/instamart/search?custom_back=true&query=board%20games", color: "bg-orange-500 text-white" },
+  { name: "Blinkit", href: "https://blinkit.com/s/?q=board%20games", color: "bg-yellow-400 text-zinc-900", note: "Order in 10 minutes" },
+  { name: "Zepto", href: "https://www.zeptonow.com/search?query=board%20games", color: "bg-violet-600 text-white", note: "Order in 10 minutes" },
+  { name: "Instamart", href: "https://www.swiggy.com/instamart/search?custom_back=true&query=board%20games", color: "bg-orange-500 text-white", note: "Order in 10 minutes" },
   { name: "Amazon", href: "https://www.amazon.in/s?k=board+games", color: "bg-foreground text-background" },
 ];
 
@@ -27,7 +27,7 @@ export const InstantOrder = () => (
             </span>
             <span>
               <div className="font-medium">{s.name}</div>
-              <div className="text-xs text-muted-foreground">Order in 10 minutes</div>
+              {s.note && <div className="text-xs text-muted-foreground">{s.note}</div>}
             </span>
           </span>
           <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />

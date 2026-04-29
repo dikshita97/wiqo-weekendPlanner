@@ -17,10 +17,13 @@ export type NearbyKind =
   | "restaurant"
   | "bakery"
   | "fast_food"
+  | "street_food"
   | "nature"
+  | "trail"
   | "attraction"
   | "museum"
   | "shopping"
+  | "club"
   | "park";
 
 type Place = {
@@ -44,9 +47,10 @@ type Props = {
 const ride = {
   uber: (lat: number, lng: number, name: string) =>
     `https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${lat}&dropoff[longitude]=${lng}&dropoff[nickname]=${encodeURIComponent(name)}`,
-  ola: (lat: number, lng: number) =>
-    `https://book.olacabs.com/?drop_lat=${lat}&drop_lng=${lng}`,
-  rapido: () => `https://rapido.bike/`,
+  ola: (lat: number, lng: number, name: string) =>
+    `https://book.olacabs.com/?pickup=current_location&drop_lat=${lat}&drop_lng=${lng}&drop_name=${encodeURIComponent(name)}`,
+  rapido: (lat: number, lng: number, name: string) =>
+    `intent://booking?dropLat=${lat}&dropLng=${lng}&dropName=${encodeURIComponent(name)}#Intent;scheme=rapido;package=com.rapido.passenger;S.browser_fallback_url=${encodeURIComponent(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`)};end`,
   maps: (lat: number, lng: number, name: string) =>
     `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_place_id=${encodeURIComponent(name)}`,
 };
@@ -88,8 +92,8 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
       if (fnErr) throw new Error(fnErr.message || "Couldn't reach the map service.");
       const found = ((data?.places || []) as Place[]).filter((place) => place.name && place.lat && place.lng);
       setPlaces(found);
-      if (data?.fallback) {
-        setError("Map service is busy right now. Try refreshing in a moment.");
+      if (data?.fallback && found.length === 0) {
+        setError("Nothing came back nearby. Try a different category or refresh in a moment.");
       } else if (found.length === 0) {
         setError("Nothing came back nearby. Try a different category or widen your search.");
       }
@@ -211,10 +215,10 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
               <a href={ride.uber(selected.lat, selected.lng, selected.name)} target="_blank" rel="noreferrer" className="rounded-full bg-background text-foreground px-4 py-2 text-sm inline-flex items-center gap-2 hover:opacity-90">
                 <Car className="h-4 w-4" /> Uber
               </a>
-              <a href={ride.ola(selected.lat, selected.lng)} target="_blank" rel="noreferrer" className="rounded-full bg-background/10 border border-background/20 text-background px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-background/20">
+              <a href={ride.ola(selected.lat, selected.lng, selected.name)} target="_blank" rel="noreferrer" className="rounded-full bg-background/10 border border-background/20 text-background px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-background/20">
                 <Car className="h-4 w-4" /> Ola
               </a>
-              <a href={ride.rapido()} target="_blank" rel="noreferrer" className="rounded-full bg-background/10 border border-background/20 text-background px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-background/20">
+              <a href={ride.rapido(selected.lat, selected.lng, selected.name)} target="_blank" rel="noreferrer" className="rounded-full bg-background/10 border border-background/20 text-background px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-background/20">
                 <Bike className="h-4 w-4" /> Rapido
               </a>
               <a href={ride.maps(selected.lat, selected.lng, selected.name)} target="_blank" rel="noreferrer" className="rounded-full bg-primary-glow text-dusk px-4 py-2 text-sm inline-flex items-center gap-2 hover:opacity-90">
