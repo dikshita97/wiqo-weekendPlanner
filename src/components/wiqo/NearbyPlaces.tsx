@@ -92,8 +92,8 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
       if (fnErr) throw new Error(fnErr.message || "Couldn't reach the map service.");
       const found = ((data?.places || []) as Place[]).filter((place) => place.name && place.lat && place.lng);
       setPlaces(found);
-      if (data?.fallback) {
-        setError("Map service is busy right now. Try refreshing in a moment.");
+      if (data?.fallback && found.length === 0) {
+        setError("Nothing came back nearby. Try a different category or refresh in a moment.");
       } else if (found.length === 0) {
         setError("Nothing came back nearby. Try a different category or widen your search.");
       }
@@ -215,10 +215,10 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
               <a href={ride.uber(selected.lat, selected.lng, selected.name)} target="_blank" rel="noreferrer" className="rounded-full bg-background text-foreground px-4 py-2 text-sm inline-flex items-center gap-2 hover:opacity-90">
                 <Car className="h-4 w-4" /> Uber
               </a>
-              <a href={ride.ola(selected.lat, selected.lng)} target="_blank" rel="noreferrer" className="rounded-full bg-background/10 border border-background/20 text-background px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-background/20">
+              <a href={ride.ola(selected.lat, selected.lng, selected.name)} target="_blank" rel="noreferrer" className="rounded-full bg-background/10 border border-background/20 text-background px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-background/20">
                 <Car className="h-4 w-4" /> Ola
               </a>
-              <a href={ride.rapido()} target="_blank" rel="noreferrer" className="rounded-full bg-background/10 border border-background/20 text-background px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-background/20">
+              <a href={ride.rapido(selected.lat, selected.lng, selected.name)} target="_blank" rel="noreferrer" className="rounded-full bg-background/10 border border-background/20 text-background px-4 py-2 text-sm inline-flex items-center gap-2 hover:bg-background/20">
                 <Bike className="h-4 w-4" /> Rapido
               </a>
               <a href={ride.maps(selected.lat, selected.lng, selected.name)} target="_blank" rel="noreferrer" className="rounded-full bg-primary-glow text-dusk px-4 py-2 text-sm inline-flex items-center gap-2 hover:opacity-90">
