@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type NearbyKind =
   | "cinema"
+  | "theatre"
   | "library"
   | "stationery"
   | "spa"
@@ -14,6 +15,12 @@ export type NearbyKind =
   | "yoga"
   | "cafe"
   | "restaurant"
+  | "bakery"
+  | "fast_food"
+  | "nature"
+  | "attraction"
+  | "museum"
+  | "shopping"
   | "park";
 
 type Place = {
@@ -32,44 +39,6 @@ type Props = {
   lat?: number;
   lng?: number;
   city?: string;
-};
-
-// Overpass query builders per kind
-const KIND_FILTERS: Record<NearbyKind, string> = {
-  cinema: 'amenity=cinema',
-  library: 'amenity=library',
-  stationery: 'shop=stationery',
-  spa: 'leisure=spa|shop=massage|amenity=spa',
-  nightclub: 'amenity=nightclub',
-  bar: 'amenity=bar|amenity=pub',
-  gym: 'leisure=fitness_centre|leisure=sports_centre',
-  yoga: 'sport=yoga|leisure=fitness_centre',
-  cafe: 'amenity=cafe',
-  restaurant: 'amenity=restaurant',
-  park: 'leisure=park',
-};
-
-const buildOverpassQuery = (kinds: NearbyKind[], lat: number, lng: number, radiusM = 4000) => {
-  const parts: string[] = [];
-  for (const k of kinds) {
-    const filter = KIND_FILTERS[k];
-    for (const f of filter.split("|")) {
-      const [key, val] = f.split("=");
-      parts.push(`node["${key}"="${val}"](around:${radiusM},${lat},${lng});`);
-      parts.push(`way["${key}"="${val}"](around:${radiusM},${lat},${lng});`);
-    }
-  }
-  return `[out:json][timeout:20];(${parts.join("")});out center 30;`;
-};
-
-const haversineKm = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
 const ride = {
@@ -101,7 +70,7 @@ export const NearbyPlaces = ({ kind, title, lat, lng, city }: Props) => {
         body: { kinds, lat, lng, radiusM: 5000 },
       });
       if (fnErr) throw new Error(fnErr.message || "Couldn't reach the map service.");
-      const found = (data?.places || []) as Place[];
+      const found = ((data?.places || []) as Place[]).filter((place) => place.name && place.lat && place.lng);
       setPlaces(found);
       if (data?.fallback) {
         setError("Map service is busy right now. Try refreshing in a moment.");
