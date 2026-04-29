@@ -1,113 +1,199 @@
 <div align="center">
 
-# Wiqo
+<img src="https://img.shields.io/badge/-%F0%9F%8C%85%20WIQO-fb923c?style=for-the-badge&labelColor=1e1b4b&color=ec4899" alt="Wiqo" height="60" />
 
-### Plan your weekends the best way.
+# 🌅 Wiqo
 
-A vibe-first weekend planner. Pick a mood. Pick your dates. Get an instant, beautiful plan with everything you need to actually go do it — real places nearby, direct booking links, AI suggestions, and one-tap actions.
+### *Plan your weekends the best way.*
 
-[**Live App →**](https://wiqo-theweekendplanner.lovable.app)
+**A vibe-first weekend planner.** Pick a mood. Pick your dates.
+Get an instant, beautiful plan with everything you need to actually go do it.
+
+[![Live App](https://img.shields.io/badge/✨_Try_it_live-fb923c?style=for-the-badge&logoColor=white)](https://wiqo-theweekendplanner.lovable.app)
+[![Docs](https://img.shields.io/badge/📖_Read_the_docs-1e1b4b?style=for-the-badge)](docs/DOCUMENTATION.md)
+
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+![Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=flat-square&logo=google&logoColor=white)
+
+---
+
+</div>
+
+## 💭 The story
+
+> Most weekends die in the group chat.
+> *"What do you wanna do?"*
+> *"I dunno, what do **you** wanna do?"*
+> Two hours later, everyone's still on their phone.
+
+**Wiqo fixes that.** ✨
+
+You tell it your mood — *chill, explore, social, foodie, lazy* — and it instantly builds a plan around your **actual location** and the **dates you picked**. Real spots near you. Real distances. Real links to book a cab, order food, watch a movie, or hike a trail.
+
+No infinite scrolling. No decision fatigue. Just: **mood → plan → go.**
+
+---
+
+## 🎨 Pick a mood, get a weekend
+
+<div align="center">
+
+| 🌿 | 🧭 | 🎉 | 🧠 | 💖 | 🍜 | 💤 |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Chill** | **Explore** | **Social** | **Productive** | **Self-growth** | **Foodie** | **Lazy** |
+| *Do less,*<br>*feel better* | *Go somewhere*<br>*new* | *Make memories,*<br>*not plans* | *Reset your life*<br>*in 48 hours* | *Date*<br>*yourself* | *Eat your way*<br>*through* | *No plans =*<br>*best plans* |
 
 </div>
 
 ---
 
-## What is Wiqo?
+## ✨ What's inside
 
-Most weekends die in the group chat. "What do you want to do?" "I don't know, what do *you* want to do?" Two hours later, everyone's still on their phone.
+<table>
+<tr>
+<td width="50%" valign="top">
 
-Wiqo fixes that. You tell it your mood — chill, explore, social, foodie, lazy — and it instantly builds a plan around your actual location and the dates you picked. Real spots near you, real distances, real links to book a cab, order food, watch a movie, or hike a trail.
+### 📍 Real places, real distances
+Live results from OpenStreetMap with actual distance from your location — cafes, spas, trails, clubs, gyms, theatres, libraries.
 
-No infinite scrolling. No decision fatigue. Just: mood → plan → go.
+### 🚕 One-tap transport
+**Uber**, **Ola**, and **Rapido** deep links pre-filled with your chosen drop location.
 
-## Features
+### 🛒 Instant order
+Direct links to **Blinkit**, **Zepto**, **Instamart**, and **Amazon** for game nights and last-minute essentials.
 
-- **7 mood-based planners** — Chill, Explore, Social, Productive, Self-growth, Foodie, Lazy. Each unlocks a curated set of sub-activities.
-- **Real places nearby** — Live results from OpenStreetMap with actual distances from your location (cafes, spas, trails, clubs, gyms, theatres, libraries, and more).
-- **One-tap transport** — Uber, Ola, and Rapido deep links pre-filled with your chosen drop location.
-- **Instant order** — Direct links to Blinkit, Zepto, Instamart, and Amazon for game nights and last-minute essentials.
-- **Trending movies** — Live picks with direct links to Netflix, Prime Video, and JustWatch.
-- **AI weekend agent** — For open-ended moods ("doing nothing", "solo dates", "trying something new"), an AI agent suggests personal, feel-good ideas in real time.
-- **Save your plans** — Auth-backed history so you can revisit what you planned.
-- **Beautiful editorial design** — Sunset-vibes palette, Instrument Serif headlines, Framer Motion transitions.
-- **Fully responsive** — Mobile-first, works perfectly on phone, tablet, and desktop.
+### 🎬 Trending movies
+Live picks with direct links to **Netflix**, **Prime Video**, and **JustWatch**.
 
-## How it works
+</td>
+<td width="50%" valign="top">
+
+### 🤖 AI weekend agent
+For open-ended moods — *"doing nothing"*, *"solo dates"*, *"trying something new"* — an AI agent suggests personal ideas in real time.
+
+### 💾 Save your plans
+Auth-backed history so you can revisit what you planned.
+
+### 🎨 Editorial design
+Sunset-vibes palette • Instrument Serif headlines • Framer Motion transitions.
+
+### 📱 Fully responsive
+Mobile-first. Works perfectly on phone, tablet, and desktop.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🌊 How it works
 
 ```text
-Landing  →  Sign in  →  Pick dates  →  Pick mood  →  Pick sub-activity  →  Get your plan
+   Landing  →  Sign in  →  Pick dates  →  Pick mood  →  Pick activity  →  Your plan
+      🌅          🔐           📅            🎨            ✨              🎁
 ```
 
-Each plan page combines:
-1. **Curated content** (movies, books, games, playlists)
-2. **Live nearby places** (with real distance from you)
-3. **Action links** (book a cab, order food, navigate, watch, listen)
-4. **AI suggestions** (where the activity benefits from creativity)
+Every plan page combines **four magical layers**:
 
-## Tech stack
+```
+┌─────────────────────────────────────────────────────────┐
+│  🎯 Curated content     →  movies, books, games, songs  │
+│  📍 Live nearby places  →  with real distance from you  │
+│  🔗 Action links        →  book, order, watch, listen   │
+│  🤖 AI suggestions      →  where creativity matters     │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ Tech stack
+
+<div align="center">
 
 | Layer | Technology |
-|---|---|
-| Frontend | React 18, Vite 5, TypeScript 5 |
-| Styling | Tailwind CSS v3, shadcn/ui, Framer Motion |
-| Routing | React Router v6 |
-| State | TanStack Query, React Context |
-| Backend | Supabase (Postgres + Auth + Edge Functions) |
-| AI | Google Gemini (via AI Gateway) |
-| Places | OpenStreetMap Overpass API |
-| Geo | Browser Geolocation + Nominatim reverse-geocoding |
-| Movies | TMDB-style trending feed |
+|:---|:---|
+| 🎨 **Frontend** | React 18 · Vite 5 · TypeScript 5 |
+| 💅 **Styling** | Tailwind CSS · shadcn/ui · Framer Motion |
+| 🧭 **Routing** | React Router v6 |
+| 🔄 **State** | TanStack Query · React Context |
+| 🗄️ **Backend** | Supabase (Postgres · Auth · Edge Functions) |
+| 🤖 **AI** | Google Gemini via AI Gateway |
+| 🗺️ **Places** | OpenStreetMap Overpass API |
+| 📍 **Geo** | Browser Geolocation · Nominatim |
+| 🎬 **Movies** | TMDB-style trending feed |
 
-## Project structure
+</div>
+
+---
+
+## 📁 Project structure
 
 ```
-src/
-├── components/
-│   ├── wiqo/         # App-specific components (NearbyPlaces, AIAgent, InstantOrder, TrendingMovies)
-│   └── ui/           # shadcn primitives
-├── pages/            # Landing, Auth, PlanStart, PlanMood, PlanSubActivity, PlanResult, PlanDone
-├── lib/
-│   ├── moods.ts      # Single source of truth for moods + sub-activities
-│   └── geolocation.ts
-├── contexts/         # AuthContext
-└── integrations/supabase/
-
-supabase/functions/
-├── nearby-places/    # Overpass-powered nearby search
-├── trending-movies/  # Live movie picks
-└── weekend-ai/       # Streaming AI agent
+🌅 wiqo/
+├── 📂 src/
+│   ├── 📂 components/
+│   │   ├── wiqo/         ✨ App-specific (NearbyPlaces, AIAgent, InstantOrder, TrendingMovies)
+│   │   └── ui/           🎨 shadcn primitives
+│   ├── 📂 pages/         📄 Landing, Auth, PlanStart, PlanMood, PlanSubActivity, PlanResult
+│   ├── 📂 lib/
+│   │   ├── moods.ts      🎭 Single source of truth for moods + sub-activities
+│   │   └── geolocation.ts
+│   ├── 📂 contexts/      🔐 AuthContext
+│   └── 📂 integrations/supabase/
+│
+└── 📂 supabase/functions/
+    ├── nearby-places/    📍 Overpass-powered nearby search
+    ├── trending-movies/  🎬 Live movie picks
+    └── weekend-ai/       🤖 Streaming AI agent
 ```
 
-## Running locally
+---
+
+## 🚀 Running locally
 
 ```bash
-# Install
+# 📦 Install
 npm install
 
-# Dev server
+# 🔥 Dev server
 npm run dev
 
-# Build
+# 🏗️ Build for production
 npm run build
 
-# Test
+# ✅ Run tests
 npm run test
 ```
 
-You'll need a Supabase project (or compatible backend) with the edge functions deployed. See [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) for the full setup guide, schema, RLS policies, and API reference.
+You'll need a Supabase project with the edge functions deployed.
+See [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) for the full setup guide, schema, RLS policies, and API reference.
 
-## Documentation
+---
 
-Full technical and product documentation lives in [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) — methodology, architecture, every API and tool used, edge function contracts, database schema, and more.
+## 📖 Documentation
 
-## License
-
-All rights reserved.
+Full technical and product docs live in **[`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md)**:
+methodology · architecture · every API and tool used · edge function contracts · database schema.
 
 ---
 
 <div align="center">
 
-Made with care, for weekends that don't suck.
+### 🎨 The palette
+
+![#fff7ed](https://img.shields.io/badge/cream-fff7ed?style=for-the-badge&labelColor=fff7ed&color=fff7ed)
+![#fb923c](https://img.shields.io/badge/sunset-fb923c?style=for-the-badge&labelColor=fb923c&color=fb923c)
+![#ec4899](https://img.shields.io/badge/pink-ec4899?style=for-the-badge&labelColor=ec4899&color=ec4899)
+![#1e1b4b](https://img.shields.io/badge/indigo-1e1b4b?style=for-the-badge&labelColor=1e1b4b&color=1e1b4b)
+
+---
+
+**Made with 🧡 for weekends that don't suck.**
+
+*If Wiqo helped your weekend, give it a ⭐*
 
 </div>
