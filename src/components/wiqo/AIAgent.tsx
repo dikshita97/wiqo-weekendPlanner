@@ -172,10 +172,13 @@ export const AIAgent = ({ activity, dateRange, city }: Props) => {
               }
               style={m.role === "user" ? { display: "block", marginLeft: "auto", width: "fit-content" } : {}}
               dangerouslySetInnerHTML={{
-                __html:
-                  m.content
-                    ? renderMd(m.content)
-                    : '<span class="opacity-50 italic">...</span>',
+                __html: m.content
+                  ? DOMPurify.sanitize(renderMd(m.content), {
+                      ALLOWED_TAGS: ["a", "strong", "em", "h1", "h2", "h3", "li", "br", "span"],
+                      ALLOWED_ATTR: ["href", "target", "rel", "class"],
+                      ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|tel:)/i,
+                    })
+                  : '<span class="opacity-50 italic">...</span>',
               }}
             />
           ))}
