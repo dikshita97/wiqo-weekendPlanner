@@ -76,9 +76,9 @@ const ENDPOINTS = [
 async function fetchOverpass(query: string): Promise<any> {
   let lastErr: string = "";
   for (const url of ENDPOINTS) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 9000);
     try {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 9000);
       const r = await fetch(url, {
         method: "POST",
         headers: {
@@ -88,7 +88,6 @@ async function fetchOverpass(query: string): Promise<any> {
         body: "data=" + encodeURIComponent(query),
         signal: controller.signal,
       });
-      clearTimeout(timer);
       if (!r.ok) {
         lastErr = `${url} -> ${r.status}`;
         continue;
@@ -96,6 +95,8 @@ async function fetchOverpass(query: string): Promise<any> {
       return await r.json();
     } catch (e) {
       lastErr = `${url} -> ${e instanceof Error ? e.message : "error"}`;
+    } finally {
+      clearTimeout(timer);
     }
   }
   throw new Error(lastErr || "All Overpass endpoints failed");
@@ -144,8 +145,10 @@ Deno.serve(async (req) => {
 
   try {
     const { kinds, kind, subcategory, lat, lng, radiusM } = await req.json();
-    const requestedKinds = Array.isArray(kinds) ? kinds : [subcategory || kind].filter(Boolean);
-    if (!Array.isArray(kinds) || typeof lat !== "number" || typeof lng !== "number") {
+    const requestedKinds = (Array.isArray(kinds) ? kinds : [subcategory || kind]).filter(
+      (k: unknown): k is string => typeof k === "string" && k in KIND_FILTERS,
+    );
+    if (requestedKinds.length === 0 || typeof lat !== "number" || typeof lng !== "number") {
       return new Response(
         JSON.stringify({ error: "INVALID_INPUT", places: [], fallback: true }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
